@@ -1,0 +1,6 @@
+@Morphlow.Server_HostAddress = http://localhost:5044
+
+GET {{Morphlow.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
