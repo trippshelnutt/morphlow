@@ -1,5 +1,9 @@
 import { expect, test } from "vitest";
 
-test("testing works", () => {
+test("test1", () => {
+  expect(true);
+});
+
+test("test2", () => {
   expect(true);
 });
