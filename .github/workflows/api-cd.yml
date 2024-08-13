@@ -1,0 +1,45 @@
+# name: API (CD)
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'src/api/**'
+
+# permissions:
+#   id-token: write
+#   contents: read
+
+# jobs:
+#   API_CD:
+#     runs-on: ubuntu-latest
+
+#     defaults:
+#       run:
+#         working-directory: src/api/TransactionSorterBackend
+
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v3
+
+#     - name: Configure AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v4
+#       with:
+#         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#         aws-region: us-east-1
+
+#     - name: Setup SAM
+#       uses: aws-actions/setup-sam@v2
+
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v3
+#       with:
+#         dotnet-version: 6.0.x
+
+#     - name: SAM Build
+#       run: sam build
+
+#     - name: SAM Deploy
+#       run: sam deploy --stack-name ts-api --s3-bucket ts-dotnet-api --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset

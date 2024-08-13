@@ -1,0 +1,47 @@
+# name: App (CD)
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'src/app/**'
+
+# permissions:
+#   id-token: write
+#   contents: read
+
+# jobs:
+#   App_CD:
+#     runs-on: ubuntu-latest
+
+#     defaults:
+#       run:
+#         working-directory: src/app
+
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v3
+
+#     - name: Configure AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v4
+#       with:
+#         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#         aws-region: us-east-1
+
+#     - name: Use Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: 18.x
+#         cache: 'npm'
+#         cache-dependency-path: src/app/package-lock.json
+
+#     - name: NPM Install
+#       run: npm ci
+    
+#     - name: NPM Build
+#       run: npm run build --if-present
+    
+#     - name: NPM Deploy
+#       run: npm run deploy
