@@ -15,19 +15,10 @@ jobs:
         working-directory: src/server
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-
-    - name: .NET Restore
-      run: dotnet restore
-
-    - name: .NET Build
-      run: dotnet build --no-restore
-
-    - name: .NET Test
-      run: dotnet test --no-build --verbosity normal
+    - run: dotnet restore
+    - run: dotnet build --no-restore
+    - run: dotnet test --no-build --verbosity normal
