@@ -6,6 +6,9 @@ on:
     paths:
       - 'src/shared_infrastructure/**'
 
+permissions:
+  id-token: write
+
 jobs:
   shared_infra_ci:
     name: Shared Infra (CI)
