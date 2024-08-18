@@ -1,0 +1,72 @@
+name: Shared Infrastructure (CICD)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**/shared-infrastructure-*.yml'
+      - 'src/shared_infrastructure/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan_qa:
+    uses: ./.github/workflows/shared-infrastructure-plan.yml
+    secrets: inherit
+    with:
+      env: qa
+  approve_qa:
+    environment: QA
+  apply_qa:
+    needs: approve_qa
+    uses: ./.github/workflows/shared-infrastructure-apply.yml
+    secrets: inherit
+    with:
+      env: qa
+  plan_dev:
+    needs: apply_qa
+    uses: ./.github/workflows/shared-infrastructure-plan.yml
+    secrets: inherit
+    with:
+      env: dev
+  approve_dev:
+    environment: DEV
+  apply_dev:
+    needs: approve_dev
+    uses: ./.github/workflows/shared-infrastructure-apply.yml
+    secrets: inherit
+    with:
+      env: dev
+  # deploy_dev:
+  #   if: ${{ env.is_main_build }}
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: DEV
+  #   steps:
+  #     - run: echo 'Deploying DEV...'
+  #     - run: echo 'DEV deploy complete.'
+  # deploy_stage:
+  #   if: ${{ env.is_main_build }}
+  #   needs: deploy_dev
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: STAGE
+  #   steps:
+  #     - run: echo 'Deploying STAGE...'
+  #     - run: echo 'STAGE deploy complete.'
+  # deploy_prod:
+  #   if: ${{ env.is_main_build }}
+  #   needs: deploy_stage
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: PROD
+  #   steps:
+  #     - run: echo 'Deploying PROD...'
+  #     - run: echo 'PROD deploy complete.'
+
+
