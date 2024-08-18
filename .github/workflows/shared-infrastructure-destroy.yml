@@ -1,18 +1,18 @@
-name: Shared Infra (CI)
+name: Destroy Shared Infrastructure
 
 on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - 'src/shared_infrastructure/**'
+  workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  shared_infra_ci:
-    name: Shared Infra (CI)
+  destroy:
     runs-on: ubuntu-latest
 
     defaults:
@@ -26,7 +26,5 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
     - uses: hashicorp/setup-terraform@v3
-    - run: terraform init
-    - run: terraform validate
-    - run: terraform fmt --recursive
-    - run: terraform plan
+    - run: terraform init -backend-config='key=shared/${{ inputs.env }}' -backend-config='region=us-east-1'
+    - run: terraform destroy -auto-approve -var 'env=${{ inputs.env }}'

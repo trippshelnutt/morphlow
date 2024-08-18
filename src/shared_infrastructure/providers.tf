@@ -12,12 +12,12 @@ terraform {
 
   backend "s3" {
     bucket = "morphlow-terraform-state"
-    key    = "state/dev"
-    region = "us-east-1"
   }
 }
 
+
 provider "docker" {}
+
 
 provider "aws" {
   region = var.region

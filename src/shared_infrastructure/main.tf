@@ -1,5 +1,5 @@
 resource "aws_resourcegroups_group" "resource_group" {
-  name = "morphlow"
+  name = "morphlow-${var.env}"
   resource_query {
     query = <<JSON
 {
@@ -10,6 +10,10 @@ resource "aws_resourcegroups_group" "resource_group" {
     {
       "Key": "Project",
       "Values": [ "morphlow" ]
+    },
+    {
+      "Key": "Env",
+      "Values": [ "${var.env}" ]
     }
   ]
 }
