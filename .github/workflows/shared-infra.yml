@@ -39,14 +39,14 @@ jobs:
     - run: terraform fmt --recursive
     - run: terraform plan
   deploy_qa:
-    if: github.event_name == 'pull_request'
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.ref != 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-latest
     steps:
       - run: echo 'Deploying QA...'
       - run: echo 'QA deploy complete.'
   deploy_dev:
-    if: github.event.ref == 'refs/heads/main'
+    if: ${{ (github.event_name == 'push' || github_event_name == 'workflow_dispatch') && github.event.ref == 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -55,7 +55,7 @@ jobs:
       - run: echo 'Deploying DEV...'
       - run: echo 'DEV deploy complete.'
   deploy_stage:
-    if: github.event.ref == 'refs/heads/main'
+    if: ${{ (github.event_name == 'push' || github_event_name == 'workflow_dispatch') && github.event.ref == 'refs/heads/main' }}
     needs: deploy_dev
     runs-on: ubuntu-latest
     environment:
@@ -64,7 +64,7 @@ jobs:
       - run: echo 'Deploying STAGE...'
       - run: echo 'STAGE deploy complete.'
   deploy_prod:
-    if: github.event.ref == 'refs/heads/main'
+    if: ${{ (github.event_name == 'push' || github_event_name == 'workflow_dispatch') && github.event.ref == 'refs/heads/main' }}
     needs: deploy_stage
     runs-on: ubuntu-latest
     environment:
