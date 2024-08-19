@@ -12,7 +12,7 @@ resource "aws_resourcegroups_group" "resource_group" {
       "Values": [ "morphlow" ]
     },
     {
-      "Key": "Env",
+      "Key": "Environment",
       "Values": [ "${var.env}" ]
     }
   ]
