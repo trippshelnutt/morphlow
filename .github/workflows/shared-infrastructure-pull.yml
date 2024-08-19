@@ -17,17 +17,3 @@ jobs:
   plan_pr:
     uses: ./.github/workflows/shared-infrastructure-plan.yml
     secrets: inherit
-    with:
-      env: ${{ github.head_ref }}-${{ github.run_id }}
-  apply_pr:
-    needs: plan_pr
-    uses: ./.github/workflows/shared-infrastructure-apply.yml
-    secrets: inherit
-    with:
-      env: ${{ github.head_ref }}-${{ github.run_id }}
-  destroy_pr:
-    needs: apply_pr
-    uses: ./.github/workflows/shared-infrastructure-destroy.yml
-    secrets: inherit
-    with:
-      env: ${{ github.head_ref }}-${{ github.run_id }}

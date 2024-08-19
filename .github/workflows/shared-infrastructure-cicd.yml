@@ -14,50 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  plan_qa:
-    uses: ./.github/workflows/shared-infrastructure-plan.yml
-    secrets: inherit
-    with:
-      env: qa
-  apply_qa:
-    needs: plan_qa
-    uses: ./.github/workflows/shared-infrastructure-apply.yml
-    secrets: inherit
-    with:
-      env: qa
-  plan_dev:
-    needs: apply_qa
-    uses: ./.github/workflows/shared-infrastructure-plan.yml
-    secrets: inherit
-    with:
-      env: dev
-  apply_dev:
-    needs: plan_dev
-    uses: ./.github/workflows/shared-infrastructure-apply.yml
-    secrets: inherit
-    with:
-      env: dev
-  plan_stage:
-    needs: apply_dev
-    uses: ./.github/workflows/shared-infrastructure-plan.yml
-    secrets: inherit
-    with:
-      env: stage
-  apply_stage:
-    needs: plan_stage
-    uses: ./.github/workflows/shared-infrastructure-apply.yml
-    secrets: inherit
-    with:
-      env: stage
   plan_prod:
-    needs: apply_stage
     uses: ./.github/workflows/shared-infrastructure-plan.yml
     secrets: inherit
-    with:
-      env: prod
   apply_prod:
     needs: plan_prod
     uses: ./.github/workflows/shared-infrastructure-apply.yml
     secrets: inherit
-    with:
-      env: prod

@@ -1,5 +1,24 @@
+locals {
+  environments = {
+    qa = {
+      subnet_ips = ["10.0.10.0/24", "10.0.11.0/24"]
+    },
+    dev = {
+      subnet_ips = ["10.0.20.0/24", "10.0.21.0/24"]
+    },
+    stage = {
+      subnet_ips = ["10.0.30.0/24", "10.0.31.0/24"]
+    },
+    prod = {
+      subnet_ips = ["10.0.40.0/24", "10.0.41.0/24"]
+    },
+  }
+}
+
 resource "aws_resourcegroups_group" "resource_group" {
-  name = "morphlow-${var.env}"
+  for_each = local.environments
+
+  name = "morphlow-${each.key}"
   resource_query {
     query = <<JSON
 {
@@ -13,7 +32,7 @@ resource "aws_resourcegroups_group" "resource_group" {
     },
     {
       "Key": "Environment",
-      "Values": [ "${var.env}" ]
+      "Values": [ "${each.key}" ]
     }
   ]
 }

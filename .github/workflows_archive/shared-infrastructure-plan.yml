@@ -2,6 +2,10 @@ name: Plan Shared Infrastructure
 
 on:
   workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
 
 permissions:
   id-token: write
@@ -22,12 +26,12 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
     - uses: hashicorp/setup-terraform@v3
-    - run: terraform init
+    - run: terraform init -backend-config='key=shared/${{ inputs.env }}' -backend-config='region=us-east-1'
     - run: terraform validate
     - run: terraform fmt --recursive
-    - run: terraform plan -out=shared.plan
+    - run: terraform plan -var 'env=${{ inputs.env }}' -out=${{ inputs.env }}.plan
     - uses: actions/upload-artifact@v4
       with:
-        path: src/shared_infrastructure/shared.plan
-        name: shared-terraform-plan
+        path: src/shared_infrastructure/${{ inputs.env }}.plan
+        name: ${{ inputs.env }}-terraform-plan
         overwrite: true

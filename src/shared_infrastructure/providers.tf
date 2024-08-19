@@ -12,6 +12,8 @@ terraform {
 
   backend "s3" {
     bucket = "morphlow-terraform-state"
+    key    = "shared"
+    region = "us-east-1"
   }
 }
 
