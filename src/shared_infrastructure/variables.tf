@@ -1,8 +1,3 @@
-variable "env" {
-  description = "The environment for the deployment"
-  type        = string
-}
-
 variable "region" {
   description = "The region where environment is going to be deployed"
   type        = string

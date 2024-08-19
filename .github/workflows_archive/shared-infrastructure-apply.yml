@@ -2,6 +2,10 @@ name: Apply Shared Infrastructure
 
 on:
   workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
 
 permissions:
   id-token: write
@@ -11,7 +15,7 @@ jobs:
   apply:
     runs-on: ubuntu-latest
 
-    environment: PROD
+    environment: ${{ inputs.env }}
 
     defaults:
       run:
@@ -24,9 +28,9 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
     - uses: hashicorp/setup-terraform@v3
-    - run: terraform init
+    - run: terraform init -backend-config='key=shared/${{ inputs.env }}' -backend-config='region=us-east-1'
     - uses: actions/download-artifact@v4
       with:
         path: src/shared_infrastructure
-        name: shared-terraform-plan
-    - run: terraform apply -auto-approve shared.plan
+        name: ${{ inputs.env }}-terraform-plan
+    - run: terraform apply -auto-approve ${{ inputs.env }}.plan

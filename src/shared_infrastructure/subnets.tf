@@ -1,22 +1,28 @@
-# resource "aws_subnet" "private_subnet_1" {
-#   vpc_id            = aws_vpc.ecs_vpc.id
-#   cidr_block        = "10.0.2.0/24"
-#   availability_zone = "us-east-1a"
+resource "aws_subnet" "private_subnet_1" {
+  for_each = local.environments
 
-#   tags = {
-#     Name    = "private_subnet_1"
-#     Project = "morphlow"
-#   }
-# }
+  vpc_id            = aws_vpc.vpc[each.key].id
+  cidr_block        = each.value.subnet_ips[0]
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name        = "${each.key}_private_subnet_1"
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
+}
 
 
-# resource "aws_subnet" "private_subnet_2" {
-#   vpc_id            = aws_vpc.ecs_vpc.id
-#   cidr_block        = "10.0.3.0/24"
-#   availability_zone = "us-east-1a"
+resource "aws_subnet" "private_subnet_2" {
+  for_each = local.environments
 
-#   tags = {
-#     Name    = "private_subnet_2"
-#     Project = "morphlow"
-#   }
-# }
+  vpc_id            = aws_vpc.vpc[each.key].id
+  cidr_block        = each.value.subnet_ips[1]
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name        = "${each.key}_private_subnet_2"
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
+}
