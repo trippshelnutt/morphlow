@@ -26,6 +26,7 @@ jobs:
     with:
       env: qa
   plan_dev:
+    needs: apply_qa
     uses: ./.github/workflows/shared-infrastructure-plan.yml
     secrets: inherit
     with:
@@ -37,6 +38,7 @@ jobs:
     with:
       env: dev
   plan_stage:
+    needs: apply_dev
     uses: ./.github/workflows/shared-infrastructure-plan.yml
     secrets: inherit
     with:
@@ -48,6 +50,7 @@ jobs:
     with:
       env: stage
   plan_prod:
+    needs: apply_stage
     uses: ./.github/workflows/shared-infrastructure-plan.yml
     secrets: inherit
     with:
