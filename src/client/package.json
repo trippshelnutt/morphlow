@@ -6,12 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
+    "build-docker": "run-p type-check \"build-only-docker {@}\" --",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "preview": "vite preview",
     "build-only": "vite build",
+    "build-only-docker": "vite build -c vite.docker.config.js",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "docker-build": "docker build -t morphlowclient .",
+    "docker-run": "docker run -it -p 8080:80 --rm --name morphlow-client-1 morphlowclient"
   },
   "dependencies": {
     "vue": "^3.4.29"
