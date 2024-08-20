@@ -9,15 +9,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Morphlow.Server/Morphlow.Server.csproj", "Morphlow.Server/"]
-RUN dotnet restore "./Morphlow.Server/Morphlow.Server.csproj"
+COPY ["MorphlowServer/MorphlowServer.csproj", "MorphlowServer/"]
+RUN dotnet restore "./MorphlowServer/MorphlowServer.csproj"
 COPY . .
-WORKDIR "/src/Morphlow.Server"
-RUN dotnet build "./Morphlow.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/MorphlowServer"
+RUN dotnet build "./MorphlowServer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Morphlow.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./MorphlowServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
