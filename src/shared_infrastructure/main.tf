@@ -1,16 +1,39 @@
 locals {
+  subnets = [
+    {
+      name              = "public_subnet_1",
+      cidr_block        = "10.0.10.0/24",
+      availability_zone = "us-east-1a"
+    },
+    {
+      name              = "public_subnet_2",
+      cidr_block        = "10.0.11.0/24",
+      availability_zone = "us-east-1b"
+    },
+    {
+      name              = "private_subnet_1",
+      cidr_block        = "10.0.20.0/24",
+      availability_zone = "us-east-1b"
+    },
+    {
+      name              = "private_subnet_2",
+      cidr_block        = "10.0.21.0/24",
+      availability_zone = "us-east-1b"
+    },
+  ]
+
   environments = {
     qa = {
-      subnet_ips = ["10.0.10.0/24", "10.0.11.0/24"]
+      subnets = local.subnets
     },
     dev = {
-      subnet_ips = ["10.0.20.0/24", "10.0.21.0/24"]
+      subnets = local.subnets
     },
     stage = {
-      subnet_ips = ["10.0.30.0/24", "10.0.31.0/24"]
+      subnets = local.subnets
     },
     prod = {
-      subnet_ips = ["10.0.40.0/24", "10.0.41.0/24"]
+      subnets = local.subnets
     },
   }
 }
