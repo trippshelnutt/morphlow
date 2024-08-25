@@ -4,7 +4,6 @@ resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name        = "vpc_${each.key}"
     Project     = "morphlow"
     Environment = "${each.key}"
   }
