@@ -23,7 +23,6 @@ resource "aws_subnet" "subnet" {
   availability_zone = each.value.availability_zone
 
   tags = {
-    Name        = each.value.name
     Project     = "morphlow"
     Environment = each.value.env_key
   }

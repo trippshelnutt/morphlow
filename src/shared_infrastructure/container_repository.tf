@@ -7,7 +7,6 @@ resource "aws_ecr_repository" "ecr_repository" {
   }
 
   tags = {
-    Name    = "morphlow_container_repository"
     Project = "morphlow"
   }
 }
