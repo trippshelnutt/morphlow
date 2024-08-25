@@ -22,4 +22,9 @@ resource "aws_ecs_task_definition" "server" {
   }
 ]
 JSON
+
+  tags = {
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
 }

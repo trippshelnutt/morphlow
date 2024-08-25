@@ -2,6 +2,11 @@ resource "aws_ecs_cluster" "api" {
   for_each = local.environments
 
   name = "${each.key}_api_cluster"
+
+  tags = {
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
 }
 
 resource "aws_ecs_cluster_capacity_providers" "api_capacity" {
