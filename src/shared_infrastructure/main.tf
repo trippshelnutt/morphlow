@@ -1,5 +1,5 @@
 locals {
-  subnets = [
+  public_subnets = [
     {
       name              = "public_subnet_1",
       cidr_block        = "10.0.10.0/24",
@@ -10,6 +10,8 @@ locals {
       cidr_block        = "10.0.11.0/24",
       availability_zone = "us-east-1b"
     },
+  ]
+  private_subnets = [
     {
       name              = "private_subnet_1",
       cidr_block        = "10.0.20.0/24",
@@ -24,16 +26,20 @@ locals {
 
   environments = {
     qa = {
-      subnets = local.subnets
+      public_subnets  = local.public_subnets
+      private_subnets = local.private_subnets
     },
     dev = {
-      subnets = local.subnets
+      public_subnets  = local.public_subnets
+      private_subnets = local.private_subnets
     },
     stage = {
-      subnets = local.subnets
+      public_subnets  = local.public_subnets
+      private_subnets = local.private_subnets
     },
     prod = {
-      subnets = local.subnets
+      public_subnets  = local.public_subnets
+      private_subnets = local.private_subnets
     },
   }
 }
