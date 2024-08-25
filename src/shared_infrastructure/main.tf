@@ -13,7 +13,7 @@ locals {
     {
       name              = "private_subnet_1",
       cidr_block        = "10.0.20.0/24",
-      availability_zone = "us-east-1b"
+      availability_zone = "us-east-1a"
     },
     {
       name              = "private_subnet_2",
