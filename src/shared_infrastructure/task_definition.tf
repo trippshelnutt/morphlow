@@ -1,4 +1,4 @@
-resource "aws_ecs_task_definition" "server" {
+resource "aws_ecs_task_definition" "api_task" {
   for_each = local.environments
 
   family                   = "morphlow-server"
@@ -6,8 +6,8 @@ resource "aws_ecs_task_definition" "server" {
   network_mode             = "awsvpc"
   cpu                      = 256
   memory                   = 512
-  task_role_arn            = "arn:aws:iam::879381268419:role/morphlow-github"
-  execution_role_arn       = "arn:aws:iam::879381268419:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"
+  task_role_arn            = aws_iam_role.morphlow_task_role.arn
+  execution_role_arn       = aws_iam_role.morphlow_execution_role.arn
   container_definitions    = <<JSON
 [
   {

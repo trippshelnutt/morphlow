@@ -70,3 +70,38 @@ resource "aws_lb" "app_load_balancer" {
     Environment = each.value.env_key
   }
 }
+
+resource "aws_lb_target_group" "api_blue_target_group" {
+  for_each = local.environments
+
+  name        = "${each.key}-api-blue-lb-tg"
+  port        = 443
+  protocol    = "HTTPS"
+  target_type = "ip"
+  vpc_id      = aws_vpc.vpc[each.key].id
+}
+
+resource "aws_lb_target_group" "api_green_target_group" {
+  for_each = local.environments
+
+  name        = "${each.key}-api-green-lb-tg"
+  port        = 443
+  protocol    = "HTTPS"
+  target_type = "ip"
+  vpc_id      = aws_vpc.vpc[each.key].id
+}
+
+resource "aws_lb_listener" "listener" {
+  for_each = local.environments
+
+  load_balancer_arn = aws_lb.app_load_balancer[each.key].arn
+  port              = 443
+  protocol          = "HTTPS"
+
+  certificate_arn = aws_acm_certificate.certificate.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api_blue_target_group[each.key].arn
+  }
+}

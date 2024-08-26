@@ -1,4 +1,4 @@
-resource "aws_ecs_cluster" "api" {
+resource "aws_ecs_cluster" "api_cluster" {
   for_each = local.environments
 
   name = "${each.key}_api_cluster"
@@ -12,7 +12,7 @@ resource "aws_ecs_cluster" "api" {
 resource "aws_ecs_cluster_capacity_providers" "api_capacity" {
   for_each = local.environments
 
-  cluster_name = aws_ecs_cluster.api[each.key].name
+  cluster_name = aws_ecs_cluster.api_cluster[each.key].name
 
   capacity_providers = ["FARGATE"]
 
