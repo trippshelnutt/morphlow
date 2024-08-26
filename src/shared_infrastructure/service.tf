@@ -20,8 +20,8 @@ resource "aws_ecs_service" "api_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.api_blue_target_group[each.key].arn
     container_name   = "morphlow-server"
-    container_port   = 443
+    container_port   = 8081
   }
 
-  depends_on = [aws_lb_listener.listener]
+  depends_on = [aws_lb_listener.https_listener]
 }

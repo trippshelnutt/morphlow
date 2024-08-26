@@ -11,7 +11,7 @@ resource "aws_codedeploy_deployment_group" "api_codedeploy_group" {
   app_name               = aws_codedeploy_app.api_codedeploy_app[each.key].name
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
   deployment_group_name  = "${each.key}_api_codedeploy_group"
-  service_role_arn       = aws_iam_role.morphlow_codedeploy_role.arn
+  service_role_arn       = data.aws_iam_role.morphlow_codedeploy_role.arn
 
   auto_rollback_configuration {
     enabled = true
@@ -42,7 +42,7 @@ resource "aws_codedeploy_deployment_group" "api_codedeploy_group" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = [aws_lb_listener.listener[each.key].arn]
+        listener_arns = [aws_lb_listener.https_listener[each.key].arn]
       }
 
       target_group {

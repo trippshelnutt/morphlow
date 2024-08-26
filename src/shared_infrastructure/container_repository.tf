@@ -1,12 +1,7 @@
-resource "aws_ecr_repository" "ecr_repository" {
-  name                 = "morphlow_containers"
-  image_tag_mutability = "MUTABLE"
+data "aws_ecr_repository" "morphlow_server_repository" {
+  name = "morphlow-server"
+}
 
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = {
-    Project = "morphlow"
-  }
+data "aws_ecr_repository" "morphlow_client_repository" {
+  name = "morphlow-client"
 }

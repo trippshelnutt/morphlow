@@ -75,7 +75,7 @@ resource "aws_lb_target_group" "api_blue_target_group" {
   for_each = local.environments
 
   name        = "${each.key}-api-blue-lb-tg"
-  port        = 443
+  port        = 8081
   protocol    = "HTTPS"
   target_type = "ip"
   vpc_id      = aws_vpc.vpc[each.key].id
@@ -85,22 +85,44 @@ resource "aws_lb_target_group" "api_green_target_group" {
   for_each = local.environments
 
   name        = "${each.key}-api-green-lb-tg"
-  port        = 443
+  port        = 8081
   protocol    = "HTTPS"
   target_type = "ip"
   vpc_id      = aws_vpc.vpc[each.key].id
 }
 
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "https_listener" {
   for_each = local.environments
 
   load_balancer_arn = aws_lb.app_load_balancer[each.key].arn
   port              = 443
   protocol          = "HTTPS"
 
-  certificate_arn = aws_acm_certificate.certificate.arn
+  certificate_arn = data.aws_acm_certificate.certificate.arn
 
   default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "api_rule" {
+  for_each = local.environments
+
+  listener_arn = aws_lb_listener.https_listener[each.key].arn
+  priority     = 1
+
+  condition {
+    host_header {
+      values = ["*${each.key}.morphlow.com"]
+    }
+  }
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.api_blue_target_group[each.key].arn
   }
