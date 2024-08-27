@@ -23,11 +23,3 @@ resource "aws_acm_certificate_validation" "morphlow" {
   certificate_arn         = aws_acm_certificate.certificate.arn
   validation_record_fqdns = [for record in aws_route53_record.certificate_validation : record.fqdn]
 }
-
-resource "aws_route53_record" "qa" {
-  zone_id = aws_route53_zone.morphlow.id
-  name    = "*.qa.morphlow.com."
-  type    = "CNAME"
-  ttl     = 300
-  records = ["qa-app-lb-1524071849.us-east-1.elb.amazonaws.com."]
-}

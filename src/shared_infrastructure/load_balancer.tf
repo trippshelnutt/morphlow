@@ -117,7 +117,30 @@ resource "aws_lb_listener" "https_listener" {
   # certificate_arn = data.aws_acm_certificate.certificate.arn
 
   default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404 Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "api_routing" {
+  for_each = local.environments
+
+  listener_arn = aws_lb_listener.https_listener[each.key].arn
+  priority     = 99
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.api_blue_target_group[each.key].arn
+  }
+
+  condition {
+    host_header {
+      values = ["api.qa.morphlow.com"]
+    }
   }
 }
