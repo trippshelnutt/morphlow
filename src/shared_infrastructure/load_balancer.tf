@@ -75,30 +75,46 @@ resource "aws_lb_target_group" "api_blue_target_group" {
   for_each = local.environments
 
   name        = "${each.key}-api-blue-lb-tg"
-  port        = 443
-  protocol    = "HTTPS"
+  port        = 8080
+  protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.vpc[each.key].id
+
+  health_check {
+    path                = "/swagger/index.html"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
 }
 
 resource "aws_lb_target_group" "api_green_target_group" {
   for_each = local.environments
 
   name        = "${each.key}-api-green-lb-tg"
-  port        = 443
-  protocol    = "HTTPS"
+  port        = 8080
+  protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.vpc[each.key].id
+
+  health_check {
+    path                = "/swagger/index.html"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
 }
 
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "https_listener" {
   for_each = local.environments
 
   load_balancer_arn = aws_lb.app_load_balancer[each.key].arn
-  port              = 443
-  protocol          = "HTTPS"
+  port              = 80
+  protocol          = "HTTP"
 
-  certificate_arn = aws_acm_certificate.certificate.arn
+  # certificate_arn = data.aws_acm_certificate.certificate.arn
 
   default_action {
     type             = "forward"
