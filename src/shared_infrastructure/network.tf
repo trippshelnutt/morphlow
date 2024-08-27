@@ -161,6 +161,46 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[each.key].id
 }
 
+data "aws_security_group" "default_sg" {
+  for_each = local.environments
+
+  vpc_id = aws_vpc.vpc[each.key].id
+  filter {
+    name   = "group-name"
+    values = ["default"]
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "default_allow_tcp_80" {
+  for_each = local.environments
+
+  security_group_id = data.aws_security_group.default_sg[each.key].id
+  cidr_ipv4         = var.vpc_cidr
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+
+  tags = {
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "default_allow_tcp_8080" {
+  for_each = local.environments
+
+  security_group_id = data.aws_security_group.default_sg[each.key].id
+  cidr_ipv4         = var.vpc_cidr
+  from_port         = 8080
+  ip_protocol       = "tcp"
+  to_port           = 8080
+
+  tags = {
+    Project     = "morphlow"
+    Environment = "${each.key}"
+  }
+}
+
 resource "aws_security_group" "security_group" {
   for_each = local.environments
 
@@ -174,14 +214,14 @@ resource "aws_security_group" "security_group" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_tls_ipv4" {
+resource "aws_vpc_security_group_ingress_rule" "allow_tcp_80" {
   for_each = local.environments
 
   security_group_id = aws_security_group.security_group[each.key].id
-  cidr_ipv4         = aws_vpc.vpc[each.key].cidr_block
-  from_port         = 443
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
   ip_protocol       = "tcp"
-  to_port           = 443
+  to_port           = 80
 
   tags = {
     Project     = "morphlow"
