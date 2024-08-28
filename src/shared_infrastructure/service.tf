@@ -23,6 +23,10 @@ resource "aws_ecs_service" "api_service" {
   }
 
   depends_on = [aws_lb_listener.https_listener]
+
+  lifecycle {
+    ignore_changes = [task_definition, load_balancer]
+  }
 }
 
 resource "aws_ecs_service" "app_service" {
@@ -50,4 +54,8 @@ resource "aws_ecs_service" "app_service" {
   }
 
   depends_on = [aws_lb_listener.https_listener]
+
+  lifecycle {
+    ignore_changes = [task_definition, load_balancer]
+  }
 }
