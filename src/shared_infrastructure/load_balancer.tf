@@ -179,6 +179,10 @@ resource "aws_lb_listener_rule" "api_routing" {
       values = ["api.qa.morphlow.com"]
     }
   }
+
+  lifecycle {
+    ignore_changes = [action]
+  }
 }
 
 resource "aws_lb_listener_rule" "app_routing" {
@@ -196,5 +200,9 @@ resource "aws_lb_listener_rule" "app_routing" {
     host_header {
       values = ["app.qa.morphlow.com"]
     }
+  }
+
+  lifecycle {
+    ignore_changes = [action]
   }
 }
