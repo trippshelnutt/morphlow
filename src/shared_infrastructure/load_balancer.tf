@@ -107,6 +107,42 @@ resource "aws_lb_target_group" "api_green_target_group" {
   }
 }
 
+resource "aws_lb_target_group" "app_blue_target_group" {
+  for_each = local.environments
+
+  name        = "${each.key}-app-blue-lb-tg"
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.vpc[each.key].id
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_target_group" "app_green_target_group" {
+  for_each = local.environments
+
+  name        = "${each.key}-app-green-lb-tg"
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.vpc[each.key].id
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
+}
+
 resource "aws_lb_listener" "https_listener" {
   for_each = local.environments
 
@@ -141,6 +177,24 @@ resource "aws_lb_listener_rule" "api_routing" {
   condition {
     host_header {
       values = ["api.qa.morphlow.com"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "app_routing" {
+  for_each = local.environments
+
+  listener_arn = aws_lb_listener.https_listener[each.key].arn
+  priority     = 98
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_blue_target_group[each.key].arn
+  }
+
+  condition {
+    host_header {
+      values = ["app.qa.morphlow.com"]
     }
   }
 }
