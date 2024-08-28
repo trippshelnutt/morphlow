@@ -15,7 +15,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "docker-build": "docker build -t morphlowclient .",
-    "docker-run": "docker run -it -p 8080:80 --rm --name morphlow-client-1 morphlowclient"
+    "docker-run": "docker run -it -p 8080:8080 --rm --name morphlow-client-1 morphlowclient"
   },
   "dependencies": {
     "vue": "^3.4.29"

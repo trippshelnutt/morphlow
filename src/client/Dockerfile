@@ -9,5 +9,7 @@ RUN npm run build-docker
 # production stage
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-EXPOSE 80 
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 8080
+
 CMD ["nginx", "-g", "daemon off;"]
