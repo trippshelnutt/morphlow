@@ -96,27 +96,6 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public[each.key].id
 }
 
-resource "aws_eip" "nat_eip" {
-  for_each = tomap({
-    for subnet in local.env_public_subnets : "${subnet.env_key}.${subnet.subnet_key}" => subnet
-  })
-
-  domain = "vpc"
-}
-
-resource "aws_nat_gateway" "nat" {
-  for_each = tomap({
-    for subnet in local.env_public_subnets : "${subnet.env_key}.${subnet.subnet_key}" => subnet
-  })
-
-  allocation_id = aws_eip.nat_eip[each.key].id
-  subnet_id     = aws_subnet.public_subnet[each.key].id
-
-  tags = {
-    Name = "${each.value.name}_nat_gateway"
-  }
-}
-
 resource "aws_subnet" "private_subnet" {
   for_each = tomap({
     for subnet in local.env_private_subnets : "${subnet.env_key}.${subnet.subnet_key}" => subnet
@@ -140,11 +119,6 @@ resource "aws_route_table" "private" {
 
   vpc_id = aws_vpc.vpc[each.value.env_key].id
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat[each.key].id
-  }
-
   tags = {
     Name        = "${each.key}_private_route_table"
     Project     = "morphlow"
@@ -161,83 +135,11 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[each.key].id
 }
 
-data "aws_security_group" "default_sg" {
-  for_each = local.environments
+resource "aws_vpc_endpoint_route_table_association" "private_s3" {
+  for_each = tomap({
+    for subnet in local.env_public_subnets : "${subnet.env_key}.${subnet.subnet_key}" => subnet
+  })
 
-  vpc_id = aws_vpc.vpc[each.key].id
-  filter {
-    name   = "group-name"
-    values = ["default"]
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "default_allow_tcp_80" {
-  for_each = local.environments
-
-  security_group_id = data.aws_security_group.default_sg[each.key].id
-  cidr_ipv4         = var.vpc_cidr
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
-
-  tags = {
-    Project     = "morphlow"
-    Environment = "${each.key}"
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "default_allow_tcp_8080" {
-  for_each = local.environments
-
-  security_group_id = data.aws_security_group.default_sg[each.key].id
-  cidr_ipv4         = var.vpc_cidr
-  from_port         = 8080
-  ip_protocol       = "tcp"
-  to_port           = 8080
-
-  tags = {
-    Project     = "morphlow"
-    Environment = "${each.key}"
-  }
-}
-
-resource "aws_security_group" "security_group" {
-  for_each = local.environments
-
-  name        = "${each.key}_security_group"
-  description = "Manage the security group for the ${each.key} environment"
-  vpc_id      = aws_vpc.vpc[each.key].id
-
-  tags = {
-    Project     = "morphlow"
-    Environment = "${each.key}"
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_tcp_80" {
-  for_each = local.environments
-
-  security_group_id = aws_security_group.security_group[each.key].id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
-
-  tags = {
-    Project     = "morphlow"
-    Environment = "${each.key}"
-  }
-}
-
-resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
-  for_each = local.environments
-
-  security_group_id = aws_security_group.security_group[each.key].id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1" # semantically equivalent to all ports
-
-  tags = {
-    Project     = "morphlow"
-    Environment = "${each.key}"
-  }
+  route_table_id  = aws_route_table.private[each.key].id
+  vpc_endpoint_id = aws_vpc_endpoint.s3[each.value.env_key].id
 }

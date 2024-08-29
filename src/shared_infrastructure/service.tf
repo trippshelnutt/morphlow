@@ -1,9 +1,28 @@
-resource "aws_ecs_service" "api_service" {
-  for_each = local.environments
+locals {
+  env_api_services = flatten([
+    for env_key, env in local.environments : {
+      env_key         = env_key
+      security_groups = [aws_security_group.api_service_sg[env_key].id]
+      subnets         = [for key, subnet in aws_subnet.private_subnet : subnet.id if startswith(key, env_key)]
+    }
+  ])
+  env_app_services = flatten([
+    for env_key, env in local.environments : {
+      env_key         = env_key
+      security_groups = [aws_security_group.app_service_sg[env_key].id]
+      subnets         = [for key, subnet in aws_subnet.private_subnet : subnet.id if startswith(key, env_key)]
+    }
+  ])
+}
 
-  name            = "${each.key}_api_service"
-  cluster         = aws_ecs_cluster.api_cluster[each.key].id
-  task_definition = aws_ecs_task_definition.api_task[each.key].arn
+resource "aws_ecs_service" "api_service" {
+  for_each = tomap({
+    for service in local.env_api_services : "${service.env_key}" => service
+  })
+
+  name            = "${each.value.env_key}_api_service"
+  cluster         = aws_ecs_cluster.api_cluster[each.value.env_key].id
+  task_definition = aws_ecs_task_definition.api_task[each.value.env_key].arn
   launch_type     = "FARGATE"
   desired_count   = 2
 
@@ -12,12 +31,13 @@ resource "aws_ecs_service" "api_service" {
   }
 
   network_configuration {
-    subnets          = [for key, subnet in aws_subnet.private_subnet : subnet.id if startswith(key, each.key)]
+    security_groups  = each.value.security_groups
+    subnets          = each.value.subnets
     assign_public_ip = false
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.api_blue_target_group[each.key].arn
+    target_group_arn = aws_lb_target_group.api_blue_target_group[each.value.env_key].arn
     container_name   = "morphlow-server"
     container_port   = 8080
   }
@@ -30,11 +50,13 @@ resource "aws_ecs_service" "api_service" {
 }
 
 resource "aws_ecs_service" "app_service" {
-  for_each = local.environments
+  for_each = tomap({
+    for service in local.env_app_services : "${service.env_key}" => service
+  })
 
-  name            = "${each.key}_app_service"
-  cluster         = aws_ecs_cluster.app_cluster[each.key].id
-  task_definition = aws_ecs_task_definition.app_task[each.key].arn
+  name            = "${each.value.env_key}_app_service"
+  cluster         = aws_ecs_cluster.app_cluster[each.value.env_key].id
+  task_definition = aws_ecs_task_definition.app_task[each.value.env_key].arn
   launch_type     = "FARGATE"
   desired_count   = 2
 
@@ -43,12 +65,13 @@ resource "aws_ecs_service" "app_service" {
   }
 
   network_configuration {
-    subnets          = [for key, subnet in aws_subnet.private_subnet : subnet.id if startswith(key, each.key)]
+    security_groups  = each.value.security_groups
+    subnets          = each.value.subnets
     assign_public_ip = false
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.app_blue_target_group[each.key].arn
+    target_group_arn = aws_lb_target_group.app_blue_target_group[each.value.env_key].arn
     container_name   = "morphlow-client"
     container_port   = 8080
   }
