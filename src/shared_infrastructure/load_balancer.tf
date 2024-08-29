@@ -2,7 +2,7 @@ locals {
   env_load_balancers = flatten([
     for env_key, env in local.environments : {
       env_key         = env_key
-      security_groups = [aws_security_group.security_group[env_key].id]
+      security_groups = [aws_security_group.load_balancer_sg[env_key].id]
       subnets         = [for key, subnet in aws_subnet.public_subnet : subnet.id if startswith(key, env_key)]
       log_bucket_id   = aws_s3_bucket.app_lb_logs[env_key].id
     }
