@@ -1,6 +1,16 @@
+const string morphlowSpecificOrigins = nameof(morphlowSpecificOrigins);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: morphlowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("*");
+        });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -22,6 +32,8 @@ app.UseSwaggerUI();
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(morphlowSpecificOrigins);
 
 app.MapControllers();
 
